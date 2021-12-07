@@ -1,0 +1,30 @@
+{
+  "name": "typescript-sample",
+  "version": "1.0.0",
+  "description": "A repo serving as a typescript template",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist/",
+    "dev": "nodemon src/index.ts",
+    "prebuild": "npm run clean",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage",
+    "test:interactive": "jest --watchAll"
+  },
+  "author": "custompro98",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^26.0.15",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
+    "ts-jest": "^26.4.4",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.5"
+  }
+}
