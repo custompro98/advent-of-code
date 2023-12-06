@@ -86,7 +86,7 @@ func main() {
 		validResults := 0
 
 		for _, result := range game.Results {
-			if result.Blue <= MaxBlue && result.Green <= MaxGreen && result.Red <= MaxRed {
+			if result.Blue <= MaxBlue && result.Red <= MaxRed && result.Green <= MaxGreen {
 				validResults += 1
 			}
 		}
@@ -96,7 +96,37 @@ func main() {
 		}
 	}
 
-	fmt.Println(sum)
+	fmt.Println("part 1: ", sum)
+
+	gameMinimums := make([]Result, 0)
+
+	for _, game := range games {
+		gameMinimum := Result{}
+
+		for _, result := range game.Results {
+			if result.Blue > gameMinimum.Blue {
+				gameMinimum.Blue = result.Blue
+			}
+
+			if result.Green > gameMinimum.Green {
+				gameMinimum.Green = result.Green
+			}
+
+			if result.Red > gameMinimum.Red {
+				gameMinimum.Red = result.Red
+			}
+		}
+
+		gameMinimums = append(gameMinimums, gameMinimum)
+	}
+
+	powerSum := 0
+
+	for _, minimum := range gameMinimums {
+		powerSum += minimum.Blue * minimum.Green * minimum.Red
+	}
+
+	fmt.Println("part 2: ", powerSum)
 }
 
 func readLines(path string) ([]string, error) {
