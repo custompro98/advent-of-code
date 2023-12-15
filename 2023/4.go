@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strings"
 )
@@ -12,7 +13,7 @@ type Scratchcard struct {
 	winningNumbers []string
 	yourNumbers    []string
 	isChecked      bool
-	score          int
+	numWinners     int
 }
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 		panic(fmt.Sprintf("could not read file: %v", err))
 	}
 
-	var scratchcards []Scratchcard
+	var scratchcards []*Scratchcard
 
 	for _, line := range lines {
 		sc := Scratchcard{}
@@ -52,7 +53,7 @@ func main() {
 			sc.yourNumbers = append(sc.yourNumbers, yourNumber)
 		}
 
-		scratchcards = append(scratchcards, sc)
+		scratchcards = append(scratchcards, &sc)
 	}
 
 	sum1 := 0
@@ -62,6 +63,10 @@ func main() {
 	}
 
 	fmt.Println("part 1:", sum1)
+
+	sum2 := countAllWinningCards(scratchcards)
+
+	fmt.Println("part 2:", sum2)
 }
 
 func readLines(path string) ([]string, error) {
@@ -84,23 +89,41 @@ func readLines(path string) ([]string, error) {
 
 func (sc *Scratchcard) GetScore() int {
 	if !sc.isChecked {
-		score := 0
+		numWinners := 0
 
 		for _, winningNumber := range sc.winningNumbers {
 			for _, yourNumber := range sc.yourNumbers {
 				if yourNumber == winningNumber {
-					if score == 0 {
-						score = 1
-					} else {
-						score *= 2
-					}
+					numWinners += 1
 				}
 			}
 		}
 
-		sc.score = score
+		sc.numWinners = numWinners
 		sc.isChecked = true
 	}
 
-	return sc.score
+	return int(math.Pow(2.0, float64(sc.numWinners-1)))
+}
+
+func countAllWinningCards(scratchcards []*Scratchcard) int {
+	sum := 0
+
+	for i := range scratchcards {
+		sum += 1 + countNestedWinningCards(scratchcards, i)
+	}
+
+	return sum
+}
+
+func countNestedWinningCards(scratchcards []*Scratchcard, currentCardIdx int) int {
+	currentCard := scratchcards[currentCardIdx]
+
+	acc := 0
+
+	for i := 0; i < currentCard.numWinners; i++ {
+		acc += countNestedWinningCards(scratchcards, currentCardIdx+i+1)
+	}
+
+	return acc + currentCard.numWinners
 }
