@@ -46,6 +46,7 @@ func main() {
 	stanzas := strings.Split(lines, "\n\n")
 
 	seeds := make([]*Seed, 0)
+	seedPairs := make([]*Seed, 0)
 	seedToSoil := SourceMap{title: STANZA_SEED_TO_SOIL}
 	soilToFertilizer := SourceMap{title: STANZA_SOIL_TO_FERTILIZER}
 	fertilizerToWater := SourceMap{title: STANZA_FERTILIZER_TO_WATER}
@@ -63,6 +64,7 @@ func main() {
 		switch title {
 		case STANZA_SEEDS:
 			buildSeeds(&seeds, values)
+			buildSeedPairs(&seedPairs, values)
 		case STANZA_SEED_TO_SOIL:
 			buildSourceMap(&seedToSoil, values)
 		case STANZA_SOIL_TO_FERTILIZER:
@@ -101,6 +103,26 @@ func main() {
 	}
 
 	fmt.Println("part 1", minLocation)
+
+	for _, seed := range seedPairs {
+		seed.soil = seedToSoil.GetValue(seed.seed)
+		seed.fertilizer = soilToFertilizer.GetValue(seed.soil)
+		seed.water = fertilizerToWater.GetValue(seed.fertilizer)
+		seed.light = waterToLight.GetValue(seed.water)
+		seed.temperature = lightToTemperature.GetValue(seed.light)
+		seed.humidity = temperatureToHumidity.GetValue(seed.temperature)
+		seed.location = humidityToLocation.GetValue(seed.humidity)
+	}
+
+	minLocation2 := math.MaxInt
+
+	for _, seed := range seedPairs {
+		if seed.location < minLocation2 {
+			minLocation2 = seed.location
+		}
+	}
+
+	fmt.Println("part 2", minLocation2)
 }
 
 func buildSeeds(seeds *[]*Seed, values string) {
@@ -109,6 +131,31 @@ func buildSeeds(seeds *[]*Seed, values string) {
 		*seeds = append(*seeds, &Seed{
 			seed: seed,
 		})
+	}
+}
+
+func buildSeedPairs(seeds *[]*Seed, values string) {
+	splits := strings.Split(values, " ")
+	seedSourceMap := SourceMap{}
+
+	for i := 0; i < len(splits); i++ {
+		num, _ := strconv.Atoi(splits[i])
+
+		if i%2 == 0 {
+			// If seed range start
+			seedSourceMap.sourceStart = append(seedSourceMap.sourceStart, num)
+		} else {
+			// If seed range length
+			seedSourceMap.length = append(seedSourceMap.length, num)
+		}
+	}
+
+	for idx, seed := range seedSourceMap.sourceStart {
+		for i := 0; i < seedSourceMap.length[idx]; i++ {
+			*seeds = append(*seeds, &Seed{
+				seed: seed + i,
+			})
+		}
 	}
 }
 
